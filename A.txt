@@ -1,0 +1,369 @@
+
+#include <iostream>
+using namespace std;
+
+// Recursive function
+int fibonacci(int n) {
+    if (n <= 1)
+        return n;
+
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+int main() {
+    int n;
+
+    cout << "Enter number of terms: ";
+    cin >> n;
+
+    cout << "\nNon-Recursive Fibonacci:\n";
+
+    int a = 0, b = 1, c;
+
+    for (int i = 0; i < n; i++) {
+        cout << a << " ";
+        c = a + b;
+        a = b;
+        b = c;
+    }
+
+    cout << "\n\nRecursive Fibonacci:\n";
+
+    for (int i = 0; i < n; i++) {
+        cout << fibonacci(i) << " ";
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Node {
+    char ch;
+    int freq;
+    Node *left, *right;
+};
+
+Node* createNode(char ch, int freq) {
+    Node* node = new Node();
+    node->ch = ch;
+    node->freq = freq;
+    node->left = node->right = NULL;
+    return node;
+}
+
+struct Compare {
+    bool operator()(Node* a, Node* b) {
+        return a->freq > b->freq;
+    }
+};
+
+void printCodes(Node* root, string code) {
+    if (root == NULL)
+        return;
+
+    if (root->left == NULL && root->right == NULL) {
+        cout << root->ch << " : " << code << endl;
+        return;
+    }
+
+    printCodes(root->left, code + "0");
+    printCodes(root->right, code + "1");
+}
+
+int main() {
+    int n;
+    cout << "Enter number of characters: ";
+    cin >> n;
+
+    priority_queue<Node*, vector<Node*>, Compare> pq;
+
+    cout << "Enter character and frequency:\n";
+
+    for (int i = 0; i < n; i++) {
+        char ch;
+        int freq;
+        cin >> ch >> freq;
+        pq.push(createNode(ch, freq));
+    }
+
+    while (pq.size() > 1) {
+        Node* left = pq.top();
+        pq.pop();
+
+        Node* right = pq.top();
+        pq.pop();
+
+        Node* parent = createNode('$', left->freq + right->freq);
+        parent->left = left;
+        parent->right = right;
+
+        pq.push(parent);
+    }
+
+    cout << "\nHuffman Codes:\n";
+    printCodes(pq.top(), "");
+
+    return 0;
+}
+
+
+
+
+
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, W, wt[100], p[100], dp[101][101] = {0};
+
+    cout << "Enter number of items: ";
+    cin >> n;
+
+    cout << "Enter capacity: ";
+    cin >> W;
+
+    cout << "Enter weights:\n";
+    for (int i = 0; i < n; i++)
+        cin >> wt[i];
+
+    cout << "Enter profits:\n";
+    for (int i = 0; i < n; i++)
+        cin >> p[i];
+
+    for (int i = 1; i <= n; i++) {
+        for (int w = 0; w <= W; w++) {
+            if (wt[i-1] <= w)
+                dp[i][w] = max(p[i-1] + dp[i-1][w-wt[i-1]], dp[i-1][w]);
+            else
+                dp[i][w] = dp[i-1][w];
+        }
+    }
+
+    cout << "Maximum Profit = " << dp[n][W];
+
+    return 0;
+}
+
+
+
+
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int board[20][20], n;
+
+bool isSafe(int row, int col) {
+    for (int i = 0; i < row; i++)
+        if (board[i][col]) return false;
+
+    for (int i = row-1, j = col-1; i >= 0 && j >= 0; i--, j--)
+        if (board[i][j]) return false;
+
+    for (int i = row-1, j = col+1; i >= 0 && j < n; i--, j++)
+        if (board[i][j]) return false;
+
+    return true;
+}
+
+bool solve(int row) {
+    if (row == n) return true;
+
+    for (int col = 0; col < n; col++) {
+        if (isSafe(row, col)) {
+            board[row][col] = 1;
+
+            if (solve(row + 1))
+                return true;
+
+            board[row][col] = 0;
+        }
+    }
+
+    return false;
+}
+
+int main() {
+    cout << "Enter number of queens: ";
+    cin >> n;
+
+    if (n < 1 || n > 20) {
+        cout << "Invalid input";
+        return 0;
+    }
+
+    if (solve(0)) {
+        cout << "\nSolution:\n";
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++)
+                cout << board[i][j] << " ";
+            cout << endl;
+        }
+    }
+    else
+        cout << "No solution exists";
+
+    return 0;
+}
+
+
+
+
+
+
+
+#include <bits/stdc++.h>
+using namespace std;
+
+// Partition function
+int partition(int a[], int low, int high) {
+    int pivot = a[high], i = low - 1;
+
+    for (int j = low; j < high; j++) {
+        if (a[j] < pivot)
+            swap(a[++i], a[j]);
+    }
+
+    swap(a[i + 1], a[high]);
+    return i + 1;
+}
+
+// Deterministic Quick Sort
+void deterministic(int a[], int low, int high) {
+    if (low < high) {
+        int p = partition(a, low, high);
+        deterministic(a, low, p - 1);
+        deterministic(a, p + 1, high);
+    }
+}
+
+// Randomized Quick Sort
+void randomized(int a[], int low, int high) {
+    if (low < high) {
+        int r = low + rand() % (high - low + 1);
+        swap(a[r], a[high]);
+
+        int p = partition(a, low, high);
+        randomized(a, low, p - 1);
+        randomized(a, p + 1, high);
+    }
+}
+
+int main() {
+    int n, a[100], b[100];
+
+    cout << "Enter number of elements: ";
+    cin >> n;
+
+    if (n < 1 || n > 100) {
+        cout << "Invalid size";
+        return 0;
+    }
+
+    cout << "Enter elements:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+        b[i] = a[i];
+    }
+
+    srand(time(0));
+
+    clock_t start = clock();
+    deterministic(a, 0, n - 1);
+    cout << "\nDeterministic Quick Sort:\n";
+    for (int i = 0; i < n; i++) cout << a[i] << " ";
+    cout << "\nTime: " << double(clock() - start) / CLOCKS_PER_SEC;
+
+    start = clock();
+    randomized(b, 0, n - 1);
+    cout << "\n\nRandomized Quick Sort:\n";
+    for (int i = 0; i < n; i++) cout << b[i] << " ";
+    cout << "\nTime: " << double(clock() - start) / CLOCKS_PER_SEC;
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract BankAccount {
+
+    mapping(address => uint) balances;
+
+    function deposit() public payable {
+        balances[msg.sender] += msg.value;
+    }
+
+    function withdraw(uint amount) public {
+        require(balances[msg.sender] >= amount, "Insufficient balance");
+
+        balances[msg.sender] -= amount;
+
+        (bool success, ) = payable(msg.sender).call{value: amount}("");
+        require(success, "Transfer failed");
+    }
+
+    function showBalance() public view returns(uint) {
+        return balances[msg.sender];
+    }
+}
+
+
+
+
+
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract StudentRecords {
+
+    struct Student {
+        uint rollNo;
+        string name;
+        uint marks;
+    }
+
+    Student[] public students;
+
+    function addStudent(uint _rollNo, string memory _name, uint _marks) public {
+        students.push(Student(_rollNo, _name, _marks));
+    }
+
+    function getStudent(uint index) public view returns(uint, string memory, uint) {
+        require(index < students.length, "Invalid index");
+
+        Student memory s = students[index];
+
+        return (s.rollNo, s.name, s.marks);
+    }
+
+    function getStudentCount() public view returns(uint) {
+        return students.length;
+    }
+}
+
+
+
+
+
